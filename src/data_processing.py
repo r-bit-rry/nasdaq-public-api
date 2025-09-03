@@ -63,11 +63,22 @@ class DataProcessing:
             end_dates: End dates
 
         Returns:
-            pd.Series: Days between dates
+            pd.Series: Days between dates (integer values, NaN for invalid dates)
+
+        Raises:
+            ValueError: If input arrays have different lengths
         """
-        start_series = pd.to_datetime(start_dates)
-        end_series = pd.to_datetime(end_dates)
-        return (end_series - start_series).dt.days
+        # Convert to datetime with error handling and ensure Series output
+        start_series = pd.Series(pd.to_datetime(start_dates, errors="coerce"))
+        end_series = pd.Series(pd.to_datetime(end_dates, errors="coerce"))
+
+        # Validate lengths match
+        if len(start_series) != len(end_series):
+            raise ValueError(f"Input arrays must have same length: {len(start_series)} vs {len(end_series)}")
+
+        # Calculate difference and extract days
+        timedelta_diff = end_series - start_series
+        return timedelta_diff.dt.days
 
     @staticmethod
     def filter_by_date_range(
@@ -152,9 +163,7 @@ class DataProcessing:
         return result.reset_index()
 
     @staticmethod
-    def calculate_rolling_metrics(
-        data: pd.Series, window: int, metrics: list[str] | None = None
-    ) -> pd.DataFrame:
+    def calculate_rolling_metrics(data: pd.Series, window: int, metrics: list[str] | None = None) -> pd.DataFrame:
         """
         Calculate rolling window metrics using pandas.
 
@@ -198,7 +207,7 @@ class DataProcessing:
         df_copy = df.copy()
 
         if columns is None:
-            columns = df_copy.select_dtypes(include=[np.number]).columns
+            columns = df_copy.select_dtypes(include=[np.number]).columns.tolist()
 
         for col in columns:
             if col not in df_copy.columns:
@@ -207,9 +216,9 @@ class DataProcessing:
             if strategy == "interpolate":
                 df_copy[col] = df_copy[col].interpolate()
             elif strategy == "forward_fill":
-                df_copy[col] = df_copy[col].fillna(method="ffill")
+                df_copy[col] = df_copy[col].ffill()
             elif strategy == "backward_fill":
-                df_copy[col] = df_copy[col].fillna(method="bfill")
+                df_copy[col] = df_copy[col].bfill()
             elif strategy == "drop":
                 df_copy = df_copy.dropna(subset=[col])
             else:
@@ -245,7 +254,6 @@ class DataProcessing:
         result = df_copy.groupby(grouper).agg(agg_dict).reset_index()
 
         return result
-
 
     @staticmethod
     def optimize_memory_usage(df: pd.DataFrame) -> pd.DataFrame:
@@ -327,9 +335,7 @@ class FinancialDataProcessor:
         return result.reset_index()
 
     @staticmethod
-    def aggregate_cash_flows(
-        cash_flows: list[Any], metrics: list[str] | None = None
-    ) -> dict[str, float]:
+    def aggregate_cash_flows(cash_flows: list[Any], metrics: list[str] | None = None) -> dict[str, float]:
         """
         Aggregate cash flow data using pandas.
 
@@ -375,9 +381,7 @@ class FinancialDataProcessor:
         return result
 
     @staticmethod
-    def aggregate_validation_metrics(
-        periods: list[Any], metrics: list[str] | None = None
-    ) -> dict[str, float]:
+    def aggregate_validation_metrics(periods: list[Any], metrics: list[str] | None = None) -> dict[str, float]:
         """
         Aggregate validation metrics using pandas.
 
@@ -495,9 +499,7 @@ class TimeSeriesProcessor:
     """
 
     @staticmethod
-    def parse_financial_dates(
-        date_strings: list[str], formats: list[str] | None = None
-    ) -> pd.Series:
+    def parse_financial_dates(date_strings: list[str], formats: list[str] | None = None) -> pd.Series:
         """
         Parse financial date strings using pandas with multiple format support.
 
@@ -630,9 +632,7 @@ class LargeDatasetProcessor:
     """
 
     @staticmethod
-    def process_large_market_data(
-        data: list[dict[str, Any]], operations: list[str] | None = None
-    ) -> pd.DataFrame:
+    def process_large_market_data(data: list[dict[str, Any]], operations: list[str] | None = None) -> pd.DataFrame:
         """
         Process large market data using optimized pandas operations.
 

@@ -2,7 +2,7 @@
   "autoAccept": true,
   "theme": "GitHub",
   "usageStatisticsEnabled": false,
-  "contextFileName": "AGENTS.md",
+  "contextFileName": "AGENTS.MD",
   "telemetry": {
     "enabled": false,
     "logPrompts": false

@@ -17,7 +17,7 @@ import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-from data_processing import TimeSeriesProcessor
+from .data_processing import TimeSeriesProcessor
 
 
 logger = logging.getLogger(__name__)
@@ -869,3 +869,4 @@ if __name__ == "__main__":
 
     else:
         print("❌ Failed to refresh NASDAQ cookies")
+
