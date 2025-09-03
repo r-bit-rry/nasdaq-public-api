@@ -40,12 +40,15 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/r-bity-rry/nasdaq-public-api"
+Homepage = "https://github.com/r-bit-rry/nasdaq-public-api"
 Repository = "https://github.com/r-bit-rry/nasdaq-public-api"
 Issues = "https://github.com/r-bit-rry/nasdaq-public-api/issues"
 
 [project.scripts]
-nasdaq-cli = "src.cli:main"
+nasdaq-cli = "nasdaq.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.black]
 line-length = 120
@@ -76,7 +79,7 @@ exclude = ["build", "dist", ".venv", "__pycache__", "*.pyc", "*.egg-info", ".myp
 
 [tool.ruff.lint.isort]
 force-single-line = true
-known-first-party = ["src"]
+known-first-party = ["nasdaq"]
 combine-as-imports = true
 lines-after-imports = 2
 
@@ -111,3 +114,10 @@ source = ["src"]
 show_missing = true
 skip_covered = true
 fail_under = 85
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nasdaq"]

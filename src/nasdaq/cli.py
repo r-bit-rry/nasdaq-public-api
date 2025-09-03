@@ -6,7 +6,7 @@ import argparse
 import json
 import sys
 
-from src.nasdaq import NASDAQDataIngestor
+from nasdaq import NASDAQDataIngestor
 
 
 def main():
