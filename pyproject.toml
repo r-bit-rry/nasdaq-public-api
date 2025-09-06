@@ -1,6 +1,6 @@
 [project]
 name = "nasdaq-public-api"
-version = "0.1.0"
+version = "0.2.0"
 description = "Minimal Nasdaq public API client for accessing market data. Automates cookie management and data retrieval."
 readme = "README.md"
 requires-python = ">=3.12"
