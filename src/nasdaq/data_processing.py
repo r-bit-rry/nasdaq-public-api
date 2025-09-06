@@ -7,6 +7,7 @@ replacing custom time series operations throughout the ingestion modules.
 """
 
 import logging
+import time
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
@@ -266,18 +267,19 @@ class DataProcessing:
         Returns:
             pd.DataFrame: Memory-optimized DataFrame
         """
+        column_optimization_threshold = 0.5  # Threshold for optimizing object columns
         df_optimized = df.copy()
 
         # Optimize numeric columns
-        for col in df_optimized.select_dtypes(include=["int64"]).columns:
+        for col in df_optimized.select_dtypes(include=[np.number]).columns:
             df_optimized[col] = pd.to_numeric(df_optimized[col], downcast="integer")
 
-        for col in df_optimized.select_dtypes(include=["float64"]).columns:
+        for col in df_optimized.select_dtypes(include=[float]).columns:
             df_optimized[col] = pd.to_numeric(df_optimized[col], downcast="float")
 
         # Optimize object columns
-        for col in df_optimized.select_dtypes(include=["object"]).columns:
-            if df_optimized[col].nunique() / len(df_optimized) < 0.5:
+        for col in df_optimized.select_dtypes(include=[object]).columns:
+            if df_optimized[col].nunique() / len(df_optimized) < column_optimization_threshold:
                 df_optimized[col] = df_optimized[col].astype("category")
 
         return df_optimized
@@ -673,7 +675,6 @@ class LargeDatasetProcessor:
         Returns:
             Dict[str, float]: Timing results
         """
-        import time
 
         results = {}
 
@@ -692,9 +693,8 @@ class LargeDatasetProcessor:
         if operation == "groupby" and "ticker" in df_optimized.columns:
             _ = df_optimized.groupby("ticker").agg({"adjusted_close": "mean"})
         elif operation == "sort":
-            _ = df_optimized.sort_values(
-                ["ticker", "date"] if "ticker" in df_optimized.columns else df_optimized.columns[0]
-            )
+            sort_columns = ["ticker", "date"] if "ticker" in df_optimized.columns else df_optimized.columns[0]
+            _ = df_optimized.sort_values(sort_columns)
         optimized_time = time.time() - start_time
         results["optimized_pandas"] = optimized_time
 

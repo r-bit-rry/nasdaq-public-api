@@ -23,6 +23,7 @@ This Agents.md file provides comprehensive guidance for AI code-generation agent
 * Leverage Deepwiki MCP for working with external libraries.
 * Leverage Fetch MCP for retrieving up-to-date information from the web.\
 * Always activate the virtual environment with `uv run` before running commands.
+* Always run ruff auto fix and format on generated code.
 
 ## Testing Requirements
 
